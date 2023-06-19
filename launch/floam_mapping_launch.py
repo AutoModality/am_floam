@@ -14,7 +14,8 @@ def generate_launch_description():
     package="floam",
     executable="laser_processing_node",
     name="laser_processing_node",
-    parameters=[params]
+    parameters=[params],
+    remappings={('/velodyne_points', 'sensor/lidar/pointcloud2')}
   )
 
   odom_estimation_node = Node(
@@ -31,9 +32,9 @@ def generate_launch_description():
     parameters=[params]
   )
 
-  bag_exec = ExecuteProcess(
-    cmd=["ros2", "bag", "play", "-r", "0.5", "/data/Kitti/raw/2011_09_30_0018"]
-  )
+  #bag_exec = ExecuteProcess(
+  #  cmd=["ros2", "bag", "play", "-r", "0.5", "/data/Kitti/raw/2011_09_30_0018"]
+  #)
 
   tf_node = Node(
     package="tf2_ros",
@@ -42,18 +43,18 @@ def generate_launch_description():
     arguments=['0', '0', '0', '0', '0', '0', "world", "map"]
   )
 
-  rviz_node = Node(
-    package="rviz2",
-    executable="rviz2",
-    name="rviz2",
-    arguments=["-d", join(get_package_share_directory("floam"), "rviz/", "floam_mapping.rviz")]
-  )
+  #rviz_node = Node(
+  #  package="rviz2",
+  #  executable="rviz2",
+  #  name="rviz2",
+  #  arguments=["-d", join(get_package_share_directory("floam"), "rviz/", "floam_mapping.rviz")]
+  #)
 
   return LaunchDescription([
     laser_processing_node,
     odom_estimation_node,
     laser_mapping_node,
-    bag_exec,
+    #bag_exec,
     tf_node,
-    rviz_node,
+    #rviz_node,
   ])

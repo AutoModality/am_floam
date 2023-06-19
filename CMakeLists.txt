@@ -1,12 +1,11 @@
 cmake_minimum_required(VERSION 3.5)
+cmake_policy(SET CMP0074 NEW)
+cmake_policy(SET CMP0072 NEW)
 project(floam)
-
 set(CMAKE_BUILD_TYPE "Release")
-
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
-
 # find dependencies
 find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
@@ -20,36 +19,35 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(pcl_conversions REQUIRED)
+find_package(pcl_ros REQUIRED)
 find_package(PCL REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Sophus REQUIRED)
 find_package(g2o REQUIRED)
-
-
+find_package(fmt REQUIRED)
 add_executable(laser_processing_node
   src/laser_processing_node.cpp
   src/laser_processing.cpp
   src/laser_processing_class.cpp
   src/lidar.cpp
 )
-
 ament_target_dependencies(laser_processing_node
   rclcpp
   sensor_msgs
   pcl_conversions
+  pcl_ros
 )
-
 target_include_directories(laser_processing_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
-  ${PCL_INCLUDE_DIRS})
-
+  ${PCL_INCLUDE_DIRS}
+  ${fmt_INCLUDE_DIRS}
+)
 target_link_libraries(laser_processing_node
   ${PCL_LIBRARIES}
+  fmt::fmt
 )
-
 target_compile_features(laser_processing_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-
 add_executable(odom_estimation_node
   src/odom_estimation_node.cpp
   src/odom_estimation.cpp
@@ -57,7 +55,6 @@ add_executable(odom_estimation_node
   src/lidar_optimization.cpp
   src/lidar.cpp
 )
-
 ament_target_dependencies(odom_estimation_node
   rclcpp
   sensor_msgs
@@ -65,69 +62,67 @@ ament_target_dependencies(odom_estimation_node
   geometry_msgs
   tf2
   tf2_ros
+  tf2_geometry_msgs
   pcl_conversions
+  pcl_ros
   Eigen3
   Sophus
 )
-
 target_include_directories(odom_estimation_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
-  ${PCL_INCLUDE_DIRS})
-
+  ${PCL_INCLUDE_DIRS}
+  ${fmt_INCLUDE_DIRS}
+)
 target_link_libraries(odom_estimation_node
   ${PCL_LIBRARIES}
+  ${G2O_CORE_LIBRARY}
   g2o::core
   g2o::solver_dense
+  fmt::fmt
+  -lfmt
 )
-
 target_compile_features(odom_estimation_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-
 add_executable(laser_mapping_node
   src/laser_mapping_node.cpp
   src/laser_mapping.cpp
   src/laser_mapping_class.cpp
   src/lidar.cpp
 )
-
 ament_target_dependencies(laser_mapping_node
   rclcpp
   sensor_msgs
   nav_msgs
   pcl_conversions
+  pcl_ros
   tf2
   tf2_ros
   tf2_geometry_msgs
   Eigen3
 )
-
 target_include_directories(laser_mapping_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
-  ${PCL_INCLUDE_DIRS})
-
+  ${PCL_INCLUDE_DIRS}
+  ${fmt_INCLUDE_DIRS}
+)
 target_link_libraries(laser_mapping_node
   ${PCL_LIBRARIES}
+  fmt::fmt
 )
-
 target_compile_features(laser_mapping_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-
 install(TARGETS laser_processing_node odom_estimation_node laser_mapping_node
   DESTINATION lib/${PROJECT_NAME}
 )
-
 install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
-
 install(DIRECTORY rviz
   DESTINATION share/${PROJECT_NAME}
 )
-
 install(DIRECTORY params
   DESTINATION share/${PROJECT_NAME}
 )
-
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
@@ -138,5 +133,4 @@ if(BUILD_TESTING)
   #set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
-
 ament_package()

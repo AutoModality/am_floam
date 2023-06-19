@@ -2,8 +2,8 @@
   ros__parameters:
     max_dist: 90.0
     min_dist: 3.0
-    scan_line: 64
-    scan_period: 0.1
+    scan_line: 32
+    scan_period: 0.05
     vertical_angle: 2.0
 
 /odom_estimation_node:
@@ -11,8 +11,8 @@
     map_resolution: 0.4
     max_dist: 90.0
     min_dist: 3.0
-    scan_line: 64
-    scan_period: 0.1
+    scan_line: 32
+    scan_period: 0.05
     vertical_angle: 2.0
 
 /laser_mapping_node:
@@ -20,6 +20,6 @@
     map_resolution: 0.4
     max_dist: 90.0
     min_dist: 3.0
-    scan_line: 64
-    scan_period: 0.1
+    scan_line: 32
+    scan_period: 0.05
     vertical_angle: 2.0
